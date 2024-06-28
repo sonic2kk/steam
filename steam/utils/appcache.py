@@ -69,7 +69,7 @@ def parse_appinfo(fp):
 #   uint32   - EOF: 0
 
     magic = fp.read(4)
-    if magic not in (b"'DV\x07", b"(DV\x07"):
+    if magic not in (b"'DV\x07", b"(DV\x07", b")DV\x07"):
         raise SyntaxError("Invalid magic, got %s" % repr(magic))
 
     universe = uint32.unpack(fp.read(4))[0]
