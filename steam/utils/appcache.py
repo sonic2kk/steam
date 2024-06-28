@@ -7,7 +7,7 @@ Appache file parsing examples:
 
     >>> header, apps = parse_appinfo(open('/d/Steam/appcache/appinfo.vdf', 'rb'))
     >>> header
-    {'magic': b"(DV\\x07", 'universe': 1}
+    {'magic': b")DV\\x07", 'universe': 1}
     >>> next(apps)
     {'appid': 5,
      'size': 79,
@@ -53,7 +53,7 @@ def parse_appinfo(fp):
     :return: (header, apps iterator)
     """
 # format:
-#   uint32   - MAGIC: "'DV\x07" or "(DV\x07"
+#   uint32   - MAGIC: "'DV\x07" or "(DV\x07" or b")DV\x07"
 #   uint32   - UNIVERSE: 1
 #   ---- repeated app sections ----
 #   uint32   - AppID
