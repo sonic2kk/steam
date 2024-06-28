@@ -43,6 +43,7 @@ from vdf import binary_load
 
 uint32 = struct.Struct('<I')
 uint64 = struct.Struct('<Q')
+int64 = struct.Struct('<q')
 
 def parse_appinfo(fp):
     """Parse appinfo.vdf from the Steam appcache folder
@@ -74,6 +75,18 @@ def parse_appinfo(fp):
 
     universe = uint32.unpack(fp.read(4))[0]
 
+    if magic == b')DV\x07':
+        # Read until end of null-terminated table string
+        string_table_offset = struct.unpack('q', fp.read(8))[0]
+        offset = fp.tell()
+        fp.seek(string_table_offset)
+        uint32.unpack(fp.read(4))[0]
+
+        c = b''
+        while c != b'\x00' or not c:
+            c = fp.read(1)
+        fp.seek(offset)
+
     def apps_iter():
         while True:
             appid = uint32.unpack(fp.read(4))[0]
@@ -91,10 +104,11 @@ def parse_appinfo(fp):
                 'change_number': uint32.unpack(fp.read(4))[0],
             }
 
-            if magic == b"(DV\x07":
+            if magic != b"'DV\x07":
                 app['data_sha1'] = fp.read(20)
 
-            app['data'] =  binary_load(fp)
+            # TODO reading data doesn't work
+            app['data'] = binary_load(fp)
 
             yield app
 
